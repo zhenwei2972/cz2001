@@ -230,7 +230,11 @@ public class Lab1 {
                 i++;
                 
             }
-    }
+        }
+        for(int x = 0; x< table.length; x++)
+        System.out.print(table[x]);
+
+        System.out.println("");
     }
        
 
