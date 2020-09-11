@@ -4,6 +4,7 @@
  * @author zlee041
  */
 import java.io.*;
+import java.util.concurrent.TimeUnit;
 
 public class Lab1 {
 
@@ -14,6 +15,7 @@ public class Lab1 {
         /* A loop to slide over pattern one by one */
         // -patternLength since pattern cannot exist if remaining search space
         // < length of pattern.
+        long startTime = System.nanoTime();
         for (int OuterLoop = 0; OuterLoop <= sequenceLength - patternLength; OuterLoop++) {
 
             int InnerLoop;
@@ -34,6 +36,9 @@ public class Lab1 {
             if (InnerLoop == patternLength) // 
                 System.out.println("[Naive Search] match found at index " + OuterLoop);
         }
+        long endTime = System.nanoTime();
+        long timeElapsed = endTime - startTime;
+        System.out.println("Execution time " + timeElapsed);
     }
 
     // Get the maximum of two integers,
@@ -70,7 +75,7 @@ public class Lab1 {
         int textLength = txt.length;
 
         int charTable[] = new int[256];
-
+        long startTime = System.nanoTime();
         // generate the table for number of characters to skip
         // based on pattern properties.
         preprocessingBM(pat, patternLength, charTable);
@@ -119,6 +124,9 @@ public class Lab1 {
                  */
                 s += max(1, j - charTable[txt[s + j]]);
         }
+        long endTime = System.nanoTime();
+        long timeElapsed = endTime - startTime;
+        System.out.println("Execution time " + timeElapsed);
     }
 
     public static void PrefixSkipSearch(String txt, String pat)
@@ -139,10 +147,12 @@ public class Lab1 {
         int patternLength = pat.length();
         int textLength = txt.length();
 
+        long startTime = System.nanoTime();
+
         int table[] =new int[patternLength];
         int j =0; // index to traverse pattern
         int i =0; // index to traverse text
-        buildprefixsuffixtable(txt, pat, table);
+        BuildPSTable(txt, pat, table);
 
         for(int a=0; a<textLength; a++)
         {
@@ -172,8 +182,12 @@ public class Lab1 {
                     i = i + 1;
             }
         }
+        long endTime = System.nanoTime();
+        long timeElapsed = endTime - startTime;
+        System.out.println("Execution time " + timeElapsed);
+        
     }
-    public static void buildprefixsuffixtable(String txt, String pat, int table[])
+    public static void BuildPSTable(String txt, String pat, int table[])
     {
     // build table
     // dsgwadsg
@@ -241,12 +255,14 @@ public class Lab1 {
 
     public static void main(String[] args) throws Exception {
 
+        
         // Create a new file object and read in the file.
         // relative file path 
         System.out.println("1st case");
         String full ="";
         full =readDNA("new");
         String pattern = "banananbaz";
+
         NaiveSearch(full, pattern);
         char txt[] = full.toCharArray();
         char pat[] = pattern.toCharArray();
@@ -269,7 +285,7 @@ public class Lab1 {
 
         System.out.println("3rd case");
         full = readDNA("NC_002670");
-        pattern = "AAACTGT";
+        pattern = "AAACTGA";
         NaiveSearch(full, pattern);
         txt = full.toCharArray();
         pat = pattern.toCharArray();
