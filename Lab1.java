@@ -158,7 +158,7 @@ public class Lab1 {
             if(j==patternLength)
             {
                 //index identified via i-j ? why
-                System.out.println("[Prefix Skip Search] match found at index"+(i-j));
+                System.out.println("[Prefix Skip Search] match found at index "+(i-j));
                 //set j to value of element before it.
                 j =table[j-1];
             }
@@ -223,13 +223,10 @@ public class Lab1 {
 
     }
 
-
-    public static void main(String[] args) throws Exception {
-        // Create a new file object and read in the file.
-        File DNA = new File("C:\\Users\\zw\\Desktop\\cz2001\\new.fna");
-        File DNA2 = new File("C:\\Users\\zw\\Desktop\\cz2001\\dna.fna");
+    public static String readDNA(String filename) throws IOException {
+        String path = System.getProperty("user.dir");
+        File DNA = new File(path + "\\"+filename+".fna");
         BufferedReader fileReadIn = new BufferedReader(new FileReader(DNA));
-
         String text;
         String full = "";
 
@@ -237,18 +234,33 @@ public class Lab1 {
         while ((text = fileReadIn.readLine()) != null) {
             full += text;
         }
+         // Close the file stream.
+         fileReadIn.close();
+         return full;
+    }
 
-        // Close the file stream.
-        fileReadIn.close();
+    public static void main(String[] args) throws Exception {
 
-        // System.out.print(full);
-        // System.out.println();
+        // Create a new file object and read in the file.
+        // relative file path 
+        String full ="";
+        full =readDNA("new");
         String pattern = "banananbaz";
         NaiveSearch(full, pattern);
         char txt[] = full.toCharArray();
         char pat[] = pattern.toCharArray();
         // Boyer Moore algorithm starts matching from the last character of the pattern
         // skips characters that heuristically does not match due to positioning of said characters
+        BoyerMoore(txt, pat);
+        PrefixSkipSearch(full, pattern);
+
+        //2nd test case
+        System.out.println("2nd case");
+        full = readDNA("dna");
+        pattern = "GCGCCA";
+        NaiveSearch(full, pattern);
+        txt = full.toCharArray();
+        pat = pattern.toCharArray();
         BoyerMoore(txt, pat);
         PrefixSkipSearch(full, pattern);
 
