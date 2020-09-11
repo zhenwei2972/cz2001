@@ -32,7 +32,7 @@ public class Lab1 {
             // if innerloop manage to completely traverse to full pattern lenght, then match
             // is found.
             if (InnerLoop == patternLength) // 
-                System.out.println("[Naive Search]Pattern found at index " + OuterLoop);
+                System.out.println("[Naive Search] match found at index " + OuterLoop);
         }
     }
 
@@ -96,7 +96,7 @@ public class Lab1 {
             // characters of pattern
             if (j < 0) {
                 // hence print the patterns that occur
-                System.out.println("[Booyer Moore] One pattern match found at this index = " + s);
+                System.out.println("[Booyer Moore] match found at index " + s);
 
                  // if the pattern not at the end of the text
                  if(s+ patternLength < textLength)
@@ -243,6 +243,7 @@ public class Lab1 {
 
         // Create a new file object and read in the file.
         // relative file path 
+        System.out.println("1st case");
         String full ="";
         full =readDNA("new");
         String pattern = "banananbaz";
@@ -253,11 +254,22 @@ public class Lab1 {
         // skips characters that heuristically does not match due to positioning of said characters
         BoyerMoore(txt, pat);
         PrefixSkipSearch(full, pattern);
+        System.out.println("\n");
 
         //2nd test case
         System.out.println("2nd case");
         full = readDNA("dna");
         pattern = "GCGCCA";
+        NaiveSearch(full, pattern);
+        txt = full.toCharArray();
+        pat = pattern.toCharArray();
+        BoyerMoore(txt, pat);
+        PrefixSkipSearch(full, pattern);
+        System.out.println("\n");
+
+        System.out.println("3rd case");
+        full = readDNA("NC_002670");
+        pattern = "AAACTGT";
         NaiveSearch(full, pattern);
         txt = full.toCharArray();
         pat = pattern.toCharArray();
