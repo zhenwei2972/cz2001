@@ -1,9 +1,11 @@
 
 /**
  *
- * @author zlee041
+ * @author zlee041 hi 
  */
 import java.io.*;
+import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class Lab1 {
 
@@ -14,6 +16,7 @@ public class Lab1 {
         /* A loop to slide over pattern one by one */
         // -patternLength since pattern cannot exist if remaining search space
         // < length of pattern.
+        long startTime = System.nanoTime();
         for (int OuterLoop = 0; OuterLoop <= sequenceLength - patternLength; OuterLoop++) {
 
             int InnerLoop;
@@ -32,8 +35,11 @@ public class Lab1 {
             // if innerloop manage to completely traverse to full pattern lenght, then match
             // is found.
             if (InnerLoop == patternLength) // 
-                System.out.println("[Naive Search]Pattern found at index " + OuterLoop);
+                System.out.println("[Naive Search] match found at index " + OuterLoop);
         }
+        long endTime = System.nanoTime();
+        long timeElapsed = endTime - startTime;
+        System.out.println("Execution time " + timeElapsed);
     }
 
     // Get the maximum of two integers,
@@ -70,7 +76,7 @@ public class Lab1 {
         int textLength = txt.length;
 
         int charTable[] = new int[256];
-
+        long startTime = System.nanoTime();
         // generate the table for number of characters to skip
         // based on pattern properties.
         preprocessingBM(pat, patternLength, charTable);
@@ -96,7 +102,7 @@ public class Lab1 {
             // characters of pattern
             if (j < 0) {
                 // hence print the patterns that occur
-                System.out.println("[Booyer Moore] One pattern match found at this index = " + s);
+                System.out.println("[Booyer Moore] match found at index " + s);
 
                  // if the pattern not at the end of the text
                  if(s+ patternLength < textLength)
@@ -119,6 +125,9 @@ public class Lab1 {
                  */
                 s += max(1, j - charTable[txt[s + j]]);
         }
+        long endTime = System.nanoTime();
+        long timeElapsed = endTime - startTime;
+        System.out.println("Execution time " + timeElapsed);
     }
 
     public static void PrefixSkipSearch(String txt, String pat)
@@ -139,10 +148,12 @@ public class Lab1 {
         int patternLength = pat.length();
         int textLength = txt.length();
 
+        long startTime = System.nanoTime();
+
         int table[] =new int[patternLength];
         int j =0; // index to traverse pattern
         int i =0; // index to traverse text
-        buildprefixsuffixtable(txt, pat, table);
+        BuildPSTable(txt, pat, table);
 
         for(int a=0; a<textLength; a++)
         {
@@ -157,8 +168,14 @@ public class Lab1 {
             //means we have consecutive matches 
             if(j==patternLength)
             {
-                //index identified via i-j ? why
-                System.out.println("[Prefix Skip Search] match found at index"+(i-j));
+                //index identified via i-j 
+                // i is the index in the text
+                //j is the index of the pattern
+                //so if you match until index j
+                //and you want the starting index of the pattern/text where you align
+                //you need deduct off j
+                //hence i-j is due to the traversal of the pattern.
+                System.out.println("[Prefix Skip Search] match found at index "+(i-j));
                 //set j to value of element before it.
                 j =table[j-1];
             }
@@ -172,14 +189,18 @@ public class Lab1 {
                     i = i + 1;
             }
         }
+        long endTime = System.nanoTime();
+        long timeElapsed = endTime - startTime;
+        System.out.println("Execution time " + timeElapsed);
+        
     }
-    public static void buildprefixsuffixtable(String txt, String pat, int table[])
+    public static void BuildPSTable(String txt, String pat, int table[])
     {
     // build table
     // dsgwadsg
     // 00000123
     // skip 1 , skip 2 , skip 3, since we can 
-    // continue where after d/s/g mismatches.
+    // continue  after d/s/g mismatches.
     //banananbaz
     //0000000120
     int patternLength = pat.length();
@@ -216,20 +237,22 @@ public class Lab1 {
                 i++;
                 
             }
+        }
+        /*
+        LPS debug code
+        for(int x = 0; x< table.length; x++)
+        System.out.print(table[x]);
+
+        System.out.println("");
+        */
     }
-    }
-       
-
-
+    
     }
 
-
-    public static void main(String[] args) throws Exception {
-        // Create a new file object and read in the file.
-        File DNA = new File("C:\\Users\\zw\\Desktop\\cz2001\\new.fna");
-        File DNA2 = new File("C:\\Users\\zw\\Desktop\\cz2001\\dna.fna");
+    public static String readDNA(String filename) throws IOException {
+        String path = System.getProperty("user.dir");
+        File DNA = new File(path + "\\"+filename+".fna");
         BufferedReader fileReadIn = new BufferedReader(new FileReader(DNA));
-
         String text;
         String full = "";
 
@@ -237,20 +260,120 @@ public class Lab1 {
         while ((text = fileReadIn.readLine()) != null) {
             full += text;
         }
+         // Close the file stream.
+         fileReadIn.close();
+         return full;
+    }
 
-        // Close the file stream.
-        fileReadIn.close();
+    public static void main(String[] args) throws Exception {
 
-        // System.out.print(full);
-        // System.out.println();
-        String pattern = "banananbaz";
-        NaiveSearch(full, pattern);
-        char txt[] = full.toCharArray();
-        char pat[] = pattern.toCharArray();
-        // Boyer Moore algorithm starts matching from the last character of the pattern
-        // skips characters that heuristically does not match due to positioning of said characters
-        BoyerMoore(txt, pat);
-        PrefixSkipSearch(full, pattern);
+
+        Scanner sc = new Scanner(System.in);
+        int choice = 0;
+
+        System.out.println("Select Search Algorithm: ");
+        System.out.println("1 All Algorithms");
+        System.out.println("2 Brute Force");
+        System.out.println("3 Booyer Moore");
+        System.out.println("4 KMP");
+
+        choice = sc.nextInt();
+        switch (choice) {
+            case 1:
+                // Create a new file object and read in the file.
+            // relative file path 
+            System.out.println("1st case");
+            String full ="";
+            full =readDNA("NC_008724");
+            String pattern = "TTGCTCTGTC";
+
+            NaiveSearch(full, pattern);
+            char txt[] = full.toCharArray();
+            char pat[] = pattern.toCharArray();
+            // Boyer Moore algorithm starts matching from the last character of the pattern
+            // skips characters that heuristically does not match due to positioning of said characters
+            BoyerMoore(txt, pat);
+            PrefixSkipSearch(full, pattern);
+            System.out.println("\n");
+
+            //2nd test case
+            System.out.println("2nd case");
+            full = readDNA("dna");
+            pattern = "GCGCCA";
+            NaiveSearch(full, pattern);
+            txt = full.toCharArray();
+            pat = pattern.toCharArray();
+            BoyerMoore(txt, pat);
+            PrefixSkipSearch(full, pattern);
+            System.out.println("\n");
+
+            System.out.println("3rd case");
+            full = readDNA("NC_002670");
+            pattern = "AAACTGA";
+            NaiveSearch(full, pattern);
+            txt = full.toCharArray();
+            pat = pattern.toCharArray();
+            BoyerMoore(txt, pat);
+            PrefixSkipSearch(full, pattern);
+            break;
+
+            case 2:
+            System.out.println("1st case");
+            full ="";
+            full =readDNA("NC_008724");
+            pattern = "TTGCTCTGTC";
+            NaiveSearch(full, pattern);
+            System.out.println("2nd case");
+            full = readDNA("dna");
+            pattern = "GCGCCA";
+            NaiveSearch(full, pattern);
+            System.out.println("3rd case");
+            full = readDNA("NC_002670");
+            pattern = "AAACTGA";
+            NaiveSearch(full, pattern);
+            break;
+
+            case 3:
+            full =readDNA("NC_008724");
+            pattern = "TTGCTCTGTC";
+            txt = full.toCharArray();
+            pat = pattern.toCharArray();
+            System.out.println("1st case");
+            BoyerMoore(txt, pat);
+            full = readDNA("dna");
+            pattern = "GCGCCA";
+            txt = full.toCharArray();
+            pat = pattern.toCharArray();
+            System.out.println("2nd case");
+            BoyerMoore(txt, pat);
+            System.out.println("3rd case");
+            full = readDNA("NC_002670");
+            pattern = "AAACTGA";
+            txt = full.toCharArray();
+            pat = pattern.toCharArray();
+            BoyerMoore(txt, pat);
+            break;
+
+            case 4:
+            full =readDNA("NC_008724");
+            pattern = "TTGCTCTGTC";
+            System.out.println("1st case");
+            PrefixSkipSearch(full, pattern);
+            System.out.println("2nd case");
+            full = readDNA("dna");
+            pattern = "GCGCCA";
+            PrefixSkipSearch(full, pattern);
+            System.out.println("3rd case");
+            full = readDNA("NC_002670");
+            pattern = "AAACTGA";
+            PrefixSkipSearch(full, pattern);
+            break;
+
+            default:
+                sc.close();
+                System.exit(0);
+        }  
+        
 
     }
 }
