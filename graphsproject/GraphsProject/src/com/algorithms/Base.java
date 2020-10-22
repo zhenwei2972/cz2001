@@ -1,4 +1,5 @@
 package com.algorithms;
+import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -15,8 +16,10 @@ public class Base {
 		//System.out.println("test"); 
 		System.setProperty("org.graphstream.ui", "swing");
 		//new Base();
-		RandomGraph();
-	   // BFS(graph,0,L);
+		//RandomGraph();
+		Graph newgraph = RandomGraphGenerator();
+		 Queue<Integer> L = new LinkedList<Integer>();
+	    BFS(newgraph,0,L);
 		
 	    
 	}
@@ -71,14 +74,14 @@ public class Base {
 	    graph.setAttribute("ui.stylesheet", styleSheet);
         graph.setAutoCreate(true);
         graph.setStrict(false);
-        graph.display();
+       // graph.display();
 	    gen.addSink(graph);
 	    gen.begin();
 	    for(int i=0; i<100; i++)
 	        gen.nextEvents();
 	    gen.end();
 	    graph.display();
-	    Queue<Integer> L = new LinkedList<Integer>();
+	   
 		// have to check what random graph attributes are 
 	    for (Node node : graph) {
             node.setAttribute("ui.label", node.getId());
@@ -86,29 +89,45 @@ public class Base {
 
         explore(graph.getNode("0"));
 	}
-	public static void BFS(Graph G,int S, Queue<Integer> L)
+	public static Graph RandomGraphGenerator() {
+		Graph graph = new SingleGraph("Random");
+	    Generator gen = new RandomGenerator(2);
+	    //graph.setAttribute("ui.stylesheet", styleSheet);
+        graph.setAutoCreate(true);
+        graph.setStrict(false);
+       // graph.display();
+	    gen.addSink(graph);
+	    gen.begin();
+	    for(int i=0; i<100; i++)
+	        gen.nextEvents();
+	    gen.end();
+	    return graph;
+	}
+	public static Node BFS(Graph G,String searchValue, Node node, Queue<Integer> skip)
 	{
+		//https://github.com/eugenp/tutorials/blob/master/algorithms-searching/src/main/java/com/baeldung/algorithms/breadthfirstsearch/BreadthFirstSearchAlgorithm.java
 		
-		boolean visited[] = new boolean[G.getNodeCount()];
+		//boolean visited[] = new boolean[G.getNodeCount()];
 		//mark visited node and add to queue
-		visited[S]=true;
-		L.add(S);
-		int i=0;
-		while(L.size()!=0)
+	//	visited[node]=true;
+		Queue<Node> inputQueue= new ArrayDeque<>();
+		inputQueue.add(node);
+		Node currentNode;
+		while(!inputQueue.isEmpty())
 		{
-			int curr =0;
-			//remove front element from queue save to S & print
-			curr = L.poll();
-			System.out.print("visited "+curr);
-			Node currentNode = G.getNode(curr);
-			Edge outgoingEdges =currentNode.getEdge(i);
-			i++;
-			Node nextNode =outgoingEdges.getOpposite(currentNode);
-			
-			
-			System.out.println("nextNode is"+ nextNode.getId());
+			currentNode = inputQueue.remove();
+			System.out.println("visited node "+ currentNode.getId());
+			if(currentNode.getId().equals(searchValue))
+			{
+				return currentNode;
+			}
+			else
+			{
+				inputQueue.add(currentNode.getCHILDREN);
+			}
 			
 		}
+		return node;
 		
 	}
 
