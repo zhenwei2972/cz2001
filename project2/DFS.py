@@ -1,4 +1,6 @@
 from __future__ import print_function
+
+from networkx.classes import graph
 from Nodemap import *
 import heapq
 from itertools import count
@@ -63,6 +65,13 @@ def BFS(G,origin,destination):
                     new_path = path +[node]
                     path_list.append(new_path)
     print("no path found")
+def BFS_Top(G,origin,destination,k):
+    incrementer =1
+    while(incrementer<=k):
+        path = BFS(G,origin,destination)
+        print("Top Hospital",incrementer,"is",path[-1])
+        incrementer+=1
+        destination.remove(path[-1])
 
 #def djikstraSingleSource(G,origin,destination):
      # Single source, find shortest path from one vertex
@@ -104,11 +113,11 @@ def dijsktra(graph, initial, end):
     
     while current_node != end:
         visited.add(current_node)
-        destinations = graph.edges[current_node]
+        destinations = graph[current_node]
         weight_to_current_node = shortest_paths[current_node][1]
 
         for next_node in destinations:
-            weight = graph.weights[(current_node, next_node)] + weight_to_current_node
+            weight = 1 + weight_to_current_node
             if next_node not in shortest_paths:
                 shortest_paths[next_node] = (current_node, weight)
             else:
@@ -131,35 +140,7 @@ def dijsktra(graph, initial, end):
     # Reverse path
     path = path[::-1]
     return path        
-def djikstraSingleSource(G,origin,destination):
-    shortest_path = {origin:(None,0)}
-    current_node = origin
-    visitedS = set()
 
-    while current_node != destination:
-        visitedS.add(current_node)
-        destinations = G.edges[current_node]
-        weightToCurrentNode = shortest_path[current_node][1]
-
-    for next_node in destinations:
-        weight = 1 + weightToCurrentNode
-        if next_node not in shortest_path:
-            shortest_path[next_node] = (current_node,weight)
-        else:
-            current_shortest_weight = shortest_path[next_node][1]
-            if current_shortest_weight > weight:
-                shortest_path[next_node] = (current_node,weight)
-    next_destinations = {node: shortest_path[node] for node in shortest_path if node not in visited}
-    if not next_destinations:
-        return "No route"
-    current_node = min(next_destinations,key = lambda k: next_destinations[k][1])
-    path = []
-    while current_node is not None:
-        path.append(current_node)
-        next_node = shortest_path[current_node][0]
-        current_node = next_node
-    path = path[::-1]
-    return path
 
     # S = null , V-S = {all vertex}
     # d = |V| where all are inf
@@ -225,7 +206,7 @@ def djikstraSingleSource(G,origin,destination):
     # |v| + |e| * log(v) 
     #Runing Djikstra for every node.
 def BFSDisplay():
-    nparray = ReadFile()
+    #nparray = ReadFile()
     Hospitals =ReadHospitalFile("Hospital")
     networkmap = GenerateNetworkMap()
     print(networkmap)
@@ -239,14 +220,14 @@ def BFSDisplay():
     
     #fix edge case , crash when out of range 
     combinetext = []
-    for y in range(1000):
+    for y in range(6):
         if(y in end):
             print(y,"skipping , is a hospital")
             #if hospital skip
             continue
         else:
             start =y
-            path = BFS(nparray,start, end)
+            path = BFS(networkmap,start, end)
             print(start,end)
             if(path!=None):
                 print("Nearest Hospital is",path[-1])
@@ -258,8 +239,8 @@ def BFSDisplay():
                 combinetext.append(path[-1])
                 combinetext.append("\n")
                 np.savetxt("BFSoutput.txt", combinetext,delimiter=" ", fmt="%s")
-                edges = ConvertNodeToEdge(path)
-                PrintGraph(networkmap, y)
+               # edges = ConvertNodeToEdge(path)
+               # PrintGraph(networkmap, y)
             else:
                 print("skipped, source node not connected to graph")
     
@@ -269,16 +250,21 @@ if __name__=="__main__":
     #
     #1A 1B running BFS for every node.
     #
-   # nparray = ReadFile()
+    #nparray = ReadFile()
     #generate random 
-    BFSDisplay()
-    '''
+   # BFSDisplay()
+    
     Hospitals =ReadHospitalFile("Hospital")
     networkmap = GenerateNetworkMap()
     print(networkmap)
     start = getStart()
     end =[]
+    #prototype , probably not correct way to do it. 
+    BFSDisplay()
+    BFS_Top(networkmap,start,Hospitals,2)
+    #BFSDisplay()
     
+    '''
 
     combinetext = []
     for y in range(getNumNodes()):
@@ -288,7 +274,7 @@ if __name__=="__main__":
             continue
         else:
             start =y
-          #  path = dijsktra(networkmap,start, end)
+            path = dijsktra(networkmap,start, end)
             print(start,end)
             if(path!=None):
                 print("Nearest Hospital is",path[-1])
@@ -304,8 +290,9 @@ if __name__=="__main__":
                 PrintGraph(networkmap, y)
             else:
                 print("skipped, source node not connected to graph")
+                '''
 
-'''
+
 
     #blue is start. 
     #red is end 
