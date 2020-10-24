@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
-
+from DFS import *
 start = 0
 hospital = 0
 
@@ -27,29 +27,27 @@ def getStart():
 def getHospital():
     return random.randrange(len(list(a)))
 
-def PrintGraph(networkgraph, edges):
+counter = 1
+
+
+def PrintGraph(networkgraph, start):
     color_map = []
     color_edge = []
+    global counter
+    
+    Hospitals =ReadHospitalFile("Hospital")
     for node in networkgraph:
-        if node == getHospital():
+        if node in Hospitals:
             color_map.append('red')
-        elif node == getStart():
+        elif node == start:
             color_map.append('blue')
+            counter += 1
         else: 
             color_map.append('green')
     
-    for path in edges:
-        for edge in networkgraph.edges:
-            #print(edge , path)
-            if edge == path:
-                #print('match')        
-                color_edge.append('blue')
-                break 
-            else:
-                color_edge.append('black')
             
     #print(color_edge)
-    nx.draw(networkgraph, node_color=color_map, edge_color=color_edge ,with_labels=True)
+    nx.draw(networkgraph, node_color=color_map ,with_labels=True)
  
     plt.show()
 
