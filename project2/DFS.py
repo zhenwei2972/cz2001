@@ -225,7 +225,7 @@ def djikstraSingleSource(G,origin,destination):
     # |v| + |e| * log(v) 
     #Runing Djikstra for every node.
 def BFSDisplay():
-   # nparray = ReadFile()
+    nparray = ReadFile()
     Hospitals =ReadHospitalFile("Hospital")
     networkmap = GenerateNetworkMap()
     print(networkmap)
@@ -246,7 +246,7 @@ def BFSDisplay():
             continue
         else:
             start =y
-            path = BFS(networkmap,start, end)
+            path = BFS(nparray,start, end)
             print(start,end)
             if(path!=None):
                 print("Nearest Hospital is",path[-1])
