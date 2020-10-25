@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
-from DFS import *
+#from DFS import *
 start = 0
 hospital = 0
 

@@ -15,41 +15,41 @@ def ReadHospitalFile(fileName):
     file = open('%s.txt'% fileName) 
     firstline= file.readline().strip()
     numberOfHospitals = firstline[2:]
-    #print("firstline",firstline)
     lines_skip_first = file.readlines()[0:]
     Hospitals =[]
     for line in lines_skip_first:
         Hospitals.append(int(line.rstrip()))
-    print("hospital list",Hospitals)
+    print("hospital list",Hospitals) 
     return Hospitals
     file.close()
-#not in use
-def DFS(G, origin, destination):
-    #create empty path list to store our DFS search path thus far
-    path_list = [[origin]]
 
+#not in use
+#def DFS(G, origin, destination):
+ #   #create empty path list to store our DFS search path thus far
+  #  path_list = [[origin]]
+#
     #while path list is not empty
-    while path_list:
+ #   while path_list:
         #pop last path out from the path list to explore
-        path = path_list.pop()
+   #     path = path_list.pop()
         #if last node in this path is the destination value/node, correct path is found
-        last_node = path[-1] #slice path list -1 to get last element in path list
-        if last_node ==destination:
-            return path
+    #    last_node = path[-1] #slice path list -1 to get last element in path list
+     #   if last_node ==destination:
+      #      return path
         
         #else if not, continue DFS by adding new paths.
         #we do this by adding the neighbours of the last node which are not already on the list. 
-        else: 
-            for node in G[last_node]:
-                if node not in path:
+       # else: 
+        #    for node in G[last_node]:
+         #       if node not in path:
                     # add a new path, where first element is path and second element is neighbouring node
-                    new_path = path + [node]
+          #          new_path = path + [node]
                     # add the new path to the total path list / tree
-                    path_list.append(new_path)
-    print("no path found")
+           #         path_list.append(new_path)
+   # print("no path found")
     
 def BFS(G,origin,destination):
-    #handle edge case where origin = destination
+    #handle edge case where origin = destination, that is, origin = hospital
     if origin == destination:
         print("origin same as destination, skipped")
         return [[origin]]
@@ -57,21 +57,25 @@ def BFS(G,origin,destination):
     while path_list:
         path = path_list.pop(0)
         last_node = path[-1]
-        if last_node in destination:
+        if last_node in destination: #if node is a hospital, return
             return path
-        else:
+        else:                        #else, add path + current node to list of paths
             for node in G[last_node]:
                 if node not in path:
                     new_path = path +[node]
                     path_list.append(new_path)
     print("no path found")
+
 def BFS_Top(G,origin,destination,k):
     incrementer =1
     while(incrementer<=k):
-        path = BFS(G,origin,destination)
-        print("Top Hospital",incrementer,"is",path[-1])
+        path = BFS(G,origin,destination) 
+        if (path != None): #if there is a returned path to nearest hospital
+            print("Top Hospital",incrementer,"is",path[-1]) #find top hospital
+        else:
+            print("There is no nearest hospital")
         incrementer+=1
-        destination.remove(path[-1])
+        destination.remove(path[-1]) #Remove top hospital and rerun
 
 #def djikstraSingleSource(G,origin,destination):
      # Single source, find shortest path from one vertex
@@ -205,44 +209,71 @@ def dijsktra(graph, initial, end):
     # else if use heap, fix heap can drop to log v
     # |v| + |e| * log(v) 
     #Runing Djikstra for every node.
+    
 def BFSDisplay():
     #nparray = ReadFile()
-    Hospitals =ReadHospitalFile("Hospital")
     networkmap = GenerateNetworkMap()
-    print(networkmap)
+    #print(networkmap) What is this? nothing changes if we comment out ##########################################################
     start = getStart()
     end =[]
-    #TODO read input file, to deteremine how many hospital
-    #for x in range(0,5,1):
-        #append only hospitals to end list 
-       # end.append(getHospital())
     end = Hospitals
     
     #fix edge case , crash when out of range 
     combinetext = []
-    for y in range(6):
-        if(y in end):
-            print(y,"skipping , is a hospital")
-            #if hospital skip
+    for node in range(1,getNumNodes()): #loop for every node
+        if(node in end): #if node is a hospital, skip
+            print(node,"skipped , is a hospital \n")
             continue
         else:
-            start =y
+            start = node
             path = BFS(networkmap,start, end)
             print(start,end)
-            if(path!=None):
-                print("Nearest Hospital is",path[-1])
-                print("Shortest path is ",path)
-                combinetext.append("start node")
-                combinetext.append(y)
-                combinetext.append(path)
-                combinetext.append("hospital")
-                combinetext.append(path[-1])
-                combinetext.append("\n")
+            if(path!=None): #if path is not empty, print details
+                print("Nearest Hospital is:",path[-1])
+                print("Shortest distance:",len(path), "\nShortest path is:",path, "\n")
+                combinetext.extend(["start node: ", node,"Distance to nearest hospital: ",len(path), "Shortest path: ", path, "Nearest hospital: ", path[-1], "\n"])
                 np.savetxt("BFSoutput.txt", combinetext,delimiter=" ", fmt="%s")
-               # edges = ConvertNodeToEdge(path)
-               # PrintGraph(networkmap, y)
+            # edges = ConvertNodeToEdge(path)
+            # PrintGraph(networkmap, node)
+            else: #if path empty, skip because it means node is isolated
+                print("skipped, source node not connected to graph \n")
+                
+def BFSTopDisplay(k):
+    #nparray = ReadFile()
+    networkmap = GenerateNetworkMap()
+    #print(networkmap) What is this? nothing changes if we comment out ##########################################################
+    start = getStart()
+    end =[]
+    end = Hospitals
+    
+    #fix edge case , crash when out of range 
+    combinetext = []
+    print(getNumNodes())
+    for node in range(getNumNodes()): #loop for every node
+        DupHospital= end.copy()
+        #DupHospital = Hospitals
+        for i in range(1,k+1):
+            if(node in Hospitals): #if node is a hospital, skip
+                if (i == 1):
+                    print(node,"skipped , is a hospital \n") #print once only
+                continue
             else:
-                print("skipped, source node not connected to graph")
+                start = node
+                path = BFS(networkmap,start, DupHospital)
+                print(start+1,end, DupHospital)
+                if(path!=None): #if path is not empty, print details
+                    print("Nearest Hospital", i, "is:",path[-1])
+                    print("Shortest distance:",len(path), "\nShortest path is:",path, "\n")
+                    combinetext.extend(["start node: ", node,"Distance to nearest hospital: ",len(path), "Shortest path: ", path, "Nearest hospital: ", path[-1], "\n"])
+                    np.savetxt("BFSoutput.txt", combinetext,delimiter=" ", fmt="%s")
+                    DupHospital.remove(path[-1])
+                # edges = ConvertNodeToEdge(path)
+                # PrintGraph(networkmap, node)
+                else: #if path empty, skip because it means node is isolated
+                    print("skipped, source node not connected to graph \n")
+                    break
+                
+            
     
 if __name__=="__main__":
     #push in nparray for bigfile.
@@ -256,13 +287,18 @@ if __name__=="__main__":
     
     Hospitals =ReadHospitalFile("Hospital")
     networkmap = GenerateNetworkMap()
-    print(networkmap)
+    #print(networkmap) What is this? nothing changes if we comment out ########################################
     start = getStart()
     end =[]
     #prototype , probably not correct way to do it. 
-    BFSDisplay()
-    BFS_Top(networkmap,start,Hospitals,2)
-    #BFSDisplay()
+    ######NOTE: every generated node map is different for (a)&(b) / (c) / (d)!!
+    print("Part (a) & (b)")
+    BFSTopDisplay(1)
+    print("Part (c)")
+    BFSTopDisplay(2)
+    print("Part (d)")
+    k = int(input("Enter value of k for k nearest hospitals:"))
+    BFSTopDisplay(k)
     
     '''
 
