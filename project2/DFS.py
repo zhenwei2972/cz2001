@@ -6,7 +6,7 @@ import heapq
 from itertools import count
 import networkx as nx
 from ReadFile import *
-
+from collections import deque
 def ReadFile():
     edge = np.loadtxt("roadNet-PA.txt", dtype="int32")
     array = np.array(edge)
@@ -48,6 +48,89 @@ def ReadHospitalFile(fileName):
            #         path_list.append(new_path)
    # print("no path found")
     
+#get distance to nearest hospital
+#initialize 3 lists to store important values to store from processing the nodes. 
+#such as distance from given hospital, visited status, as well as nearest node. 
+dist =[]
+visited =[]
+nearHospital =[]
+for i in range(1000000):
+    dist.append(0)
+    visited.append(0)
+    nearHospital.append(0)
+
+def multiBFS(G,hospitalQueue):
+    global dist
+    global visited
+    # use BFS to traverse entire graph from EVERY hospital to every node.
+    # saving resulting distance to 
+    while(hospitalQueue):
+        k = hospitalQueue.pop(0)
+        #push adjacent unvisited nodes with distance from current source = node distance +1
+        #traverse each adjacent neighbour , if not yet marked as visited. 
+        for node in G[k]:
+            if(visited[node]==0):
+                #add current node to hospital queue ( BFS traversal step )
+                hospitalQueue.append(node)
+                #set distance of current node from source to current node distance + 1. simple increment (process current node, setting value of distance to this node (k) distance + 1 )
+                dist[node] = dist[k]+1
+                nearHospital[node] = k
+                #mark node as traversed.
+                visited[node]=True
+
+def nearestHospital(G,n,sources,s):
+    #queue for BFS
+    q =[]
+    global dist
+    global visited
+    # mark source vertices as visited and add to queue
+    for all in range(1,s):
+        q.append(sources[all])
+        visited[sources[all]] = True
+    multiBFS(G,q)
+
+    #print out results of stored distance values from traversal. 
+    i =1
+    for allDist in range(1,n):
+        print("distance of node ",i, " is ",dist[allDist],"from nearest hospital",nearHospital[allDist])
+        i=i+1
+
+def display():
+    networkmap = GenerateNetworkMap()
+    print("testing multi path BFS, not sure if working. ")
+    sources =[]
+    sources = Hospitals
+    S = len(Hospitals)
+    nearestHospital(networkmap,getNumNodes(),sources,S)
+    
+
+    print(" working BFS to compare with")
+    start = getStart()
+    end =[]
+    end = Hospitals
+    
+    #fix edge case , crash when out of range 
+    combinetext = []
+    for node in range(1,getNumNodes()): #loop for every node
+        if(node in end): #if node is a hospital, skip
+            print(node,"skipped , is a hospital \n")
+            continue
+        else:
+            start = node
+            path = BFS(networkmap,start, end)
+            print(start,end)
+            if(path!=None): #if path is not empty, print details
+                print("Nearest Hospital is:",path[-1])
+                print("Shortest distance:",len(path), "\nShortest path is:",path, "\n")
+                combinetext.extend(["start node: ", node,"Distance to nearest hospital: ",len(path), "Shortest path: ", path, "Nearest hospital: ", path[-1], "\n"])
+                np.savetxt("BFSoutput.txt", combinetext,delimiter=" ", fmt="%s")
+            # edges = ConvertNodeToEdge(path)
+            # PrintGraph(networkmap, node)
+            else: #if path empty, skip because it means node is isolated
+                print("skipped, source node not connected to graph \n")
+
+
+# run thorugh all node , then from all nodes, run bfs to find closest hospital.
 def BFS(G,origin,destination):
     #handle edge case where origin = destination, that is, origin = hospital
     if origin == destination:
@@ -56,6 +139,7 @@ def BFS(G,origin,destination):
     path_list = [[origin]]
     while path_list:
         path = path_list.pop(0)
+        # popping from front of list, (queue functionality)
         last_node = path[-1]
         if last_node in destination: #if node is a hospital, return
             return path
@@ -291,15 +375,20 @@ if __name__=="__main__":
     start = getStart()
     end =[]
     #prototype , probably not correct way to do it. 
+
+    # working code commented out.
+
     ######NOTE: every generated node map is different for (a)&(b) / (c) / (d)!!
-    print("Part (a) & (b)")
-    BFSTopDisplay(1)
-    print("Part (c)")
-    BFSTopDisplay(2)
-    print("Part (d)")
-    k = int(input("Enter value of k for k nearest hospitals:"))
-    BFSTopDisplay(k)
+    #print("Part (a) & (b)")
+    #BFSTopDisplay(1)
+    #print("Part (c)")
+    #BFSTopDisplay(2)
+    #print("Part (d)")
+    #k = int(input("Enter value of k for k nearest hospitals:"))
+    #BFSTopDisplay(k)
     
+    #testing code
+    display()
     '''
 
     combinetext = []
