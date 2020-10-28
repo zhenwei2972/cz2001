@@ -73,8 +73,11 @@ def multiBFS(G,hospitalQueue):
                 #add current node to hospital queue ( BFS traversal step )
                 hospitalQueue.append(node)
                 #set distance of current node from source to current node distance + 1. simple increment (process current node, setting value of distance to this node (k) distance + 1 )
-                dist[node] = dist[k]+1
+                #if visited by this hospital, return hospital
                 nearHospital[node] = k
+                #building distance from per node to hospital. 
+                dist[node] = dist[k]+1
+                
                 #mark node as traversed.
                 visited[node]=True
 
@@ -84,7 +87,7 @@ def nearestHospital(G,n,sources,s):
     global dist
     global visited
     # mark source vertices as visited and add to queue
-    for all in range(1,s):
+    for all in range(0,s):
         q.append(sources[all])
         visited[sources[all]] = True
     multiBFS(G,q)
